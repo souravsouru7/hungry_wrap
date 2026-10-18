@@ -1,0 +1,58 @@
+{
+  "01_tomatoes.png": [
+    520,
+    385
+  ],
+  "02_lettuce.png": [
+    620,
+    469
+  ],
+  "03_grilled_chicken.png": [
+    900,
+    900
+  ],
+  "08_top_left_leaf.png": [
+    620,
+    571
+  ],
+  "09_orange_disc.png": [
+    1100,
+    1100
+  ],
+  "10_lettuce_frill.png": [
+    460,
+    426
+  ],
+  "11_tomato_wedge.png": [
+    460,
+    354
+  ],
+  "12_cucumber_slice.png": [
+    317,
+    420
+  ],
+  "13_onion_rings.png": [
+    401,
+    390
+  ],
+  "14_tomato_slices.png": [
+    389,
+    392
+  ],
+  "15_herb_leaves.png": [
+    361,
+    388
+  ],
+  "16_spice_flecks.png": [
+    360,
+    338
+  ],
+  "17_lettuce_sharp.png": [
+    393,
+    378
+  ],
+  "18_chicken_sharp.png": [
+    395,
+    372
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "01_restaurant_organic_cutout.png": [
+    1920,
+    910
+  ],
+  "02_leaf_top.png": [
+    444,
+    880
+  ],
+  "03_leaf_right.png": [
+    674,
+    880
+  ],
+  "04_leaf_lower.png": [
+    867,
+    880
+  ],
+  "05_leaf_cluster.png": [
+    1120,
+    946
+  ],
+  "06_foreground_blurred_leaves.png": [
+    1114,
+    1120
+  ],
+  "07_orange_brush_underline.png": [
+    900,
+    45
+  ]
+}

@@ -1,0 +1,648 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ---------------------------------------------------------------- brand ---
+   The Hungry Wrap palette and display face, used by the scroll journey hero. */
+@theme {
+  --color-espresso: #201712;
+  --color-ember: #f47721;
+  --color-cream: #fff7ef;
+  --color-pale: #ffe3c4;
+  --color-ink: #181615;
+}
+
+@theme inline {
+  --font-display: var(--font-anton);
+}
+
+/* Registered so GSAP and CSS can interpolate them as colours, not strings. */
+@property --hero-ink {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #fff7ef;
+}
+
+@property --hero-accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f47721;
+}
+
+@property --hero-rail {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(255, 247, 239, 0.14);
+}
+
+/* prefers-reduced-motion: the stage is never pinned, so the section collapses
+   to a single screen instead of reserving scroll length for a timeline. */
+.hero-journey[data-static="true"] {
+  height: auto;
+}
+
+.hero-hint-dot {
+  animation: hero-hint 1.8s ease-in-out infinite;
+}
+
+@keyframes hero-hint {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(6px); opacity: 0.4; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-hint-dot {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------- exact-copy hero ---
+   Palette, type scale and motion primitives for <HungryWrapHero />.
+   Everything here is scoped to .hw-hero so it cannot leak into the
+   scroll journey hero above. */
+.hw-hero {
+  /* Plain custom properties, not @theme tokens: an `inline` theme block does
+     not emit the variable itself, so `var(--font-hero-display)` resolved to
+     nothing and the headline silently fell back to Arial. */
+  --hw-font-display: var(--font-pacifico), "Comic Sans MS", cursive;
+  --hw-font-script: var(--font-marker), "Comic Sans MS", cursive;
+  --hw-font-ui: var(--font-poppins), system-ui, sans-serif;
+  --hw-orange: #f5811f;
+  --hw-orange-deep: #e06a10;
+  --hw-orange-soft: #ffb15c;
+  --hw-charcoal: #231a15;
+  --hw-cream: #fdf4e9;
+  --hw-cream-deep: #f7e4cc;
+}
+
+/* The chunky extruded headline. Two stacked shadow sets: a short hard
+   extrusion for the 3D body, then a wide soft one for the drop shadow. */
+/* Pacifico is the closest brush script on Google Fonts but runs lighter
+   than the reference lettering, so a same-colour stroke fattens the glyphs
+   before the extrusion shadows go on. */
+.hw-title-dark {
+  color: #241a14;
+  -webkit-text-stroke: 0.035em #241a14;
+  paint-order: stroke fill;
+  text-shadow:
+    0 3px 0 #1b1310,
+    0 6px 0 #140e0b,
+    0 9px 1px #0d0908,
+    0 18px 26px rgba(60, 40, 24, 0.32);
+}
+
+.hw-title-orange {
+  color: #f79231;
+  -webkit-text-stroke: 0.035em #f79231;
+  paint-order: stroke fill;
+  text-shadow:
+    0 3px 0 #ef8020,
+    0 7px 0 #dd6d12,
+    0 11px 1px #c75a08,
+    0 22px 30px rgba(214, 102, 16, 0.4),
+    0 0 48px rgba(255, 176, 92, 0.55);
+}
+
+/* Continuous float. Amplitude, rotation, duration and phase are set
+   per-element so no two ingredients bob in lockstep. */
+@keyframes hw-bob {
+  0%,
+  100% {
+    transform: translate3d(0, calc(var(--hw-bob-y, 10px) * -1), 0) rotate(calc(var(--hw-bob-r, 0deg) * -1));
+  }
+  50% {
+    transform: translate3d(0, var(--hw-bob-y, 10px), 0) rotate(var(--hw-bob-r, 0deg));
+  }
+}
+
+.hw-bob {
+  animation: hw-bob var(--hw-bob-d, 6s) ease-in-out var(--hw-bob-delay, 0s) infinite;
+}
+
+/* Slow drift for the sauce ribbon — rotation plus a touch of breathing. */
+@keyframes hw-drift {
+  0%,
+  100% {
+    transform: rotate(-2.5deg) scale(1);
+  }
+  50% {
+    transform: rotate(2.5deg) scale(1.035);
+  }
+}
+
+.hw-drift {
+  animation: hw-drift var(--hw-bob-d, 14s) ease-in-out infinite;
+}
+
+.hw-feature-icon {
+  transition: transform 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hw-feature:hover .hw-feature-icon {
+    transform: translateY(-4px) rotate(-5deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hw-bob,
+  .hw-drift {
+    animation: none;
+  }
+
+  .hw-feature-icon {
+    transition: none;
+  }
+
+  .hw-hero a,
+  .hw-hero button,
+  .hw-hero nav a span {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------- why choose us ---
+   Palette, layout and motion primitives for <WhyChooseUs />. Scoped to
+   .hw-why so nothing leaks into either hero above. The section rebuilds
+   every heading, badge and icon in HTML/CSS/SVG — the only raster pieces
+   are the transparent food cutouts. */
+.hw-why {
+  --hw-why-cream: #fff9f0;
+  --hw-why-cream-deep: #fdf0dd;
+  --hw-why-ink: #151313;
+  --hw-why-orange: #f47419;
+  --hw-why-green: #6ea32e;
+  --hw-why-red: #f12d24;
+  /* The reference's smile medallion is yellow; the brief's palette stops at
+     the orange, so this is the one colour chosen rather than specified. */
+  --hw-why-yellow: #f2b01e;
+  --hw-why-body: #4a403a;
+
+  --hw-why-font-display: var(--font-baloo), var(--font-poppins), system-ui, sans-serif;
+  --hw-why-font-ui: var(--font-poppins), system-ui, sans-serif;
+}
+
+/* Copy first, then the product, then the benefits on a phone; on desktop the
+   wrap takes a full-height column down the left and the copy stacks beside
+   it. Grid areas keep that reordering in CSS, so the DOM order stays the
+   reading order. */
+.hw-why-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "copy"
+    "stage"
+    "features";
+}
+
+@media (min-width: 1024px) {
+  .hw-why-grid {
+    grid-template-columns: 54% minmax(0, 46%);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "stage copy"
+      "stage features";
+    align-items: center;
+  }
+}
+
+.hw-why-copy {
+  grid-area: copy;
+}
+.hw-why-stage {
+  grid-area: stage;
+}
+.hw-why-features {
+  grid-area: features;
+}
+
+/* Pacifico is the nearest brush face already loaded by the layout, but it
+   runs far lighter than the reference lettering, so a same-colour stroke
+   fattens the glyphs. Flat here — unlike the hero, this headline has no
+   extrusion in the reference. */
+.hw-why-title-dark {
+  color: var(--hw-why-ink);
+  -webkit-text-stroke: 0.012em var(--hw-why-ink);
+  paint-order: stroke fill;
+}
+
+.hw-why-title-orange {
+  color: var(--hw-why-orange);
+  -webkit-text-stroke: 0.012em var(--hw-why-orange);
+  paint-order: stroke fill;
+}
+
+/* White medallion + faint orange shadow, lifting on hover. Hover is pure
+   decoration: every benefit is readable and complete without it. */
+.hw-why-medallion {
+  background: #ffffff;
+  box-shadow:
+    0 10px 24px -12px rgba(244, 116, 25, 0.55),
+    0 2px 6px -2px rgba(244, 116, 25, 0.25),
+    inset 0 0 0 1px rgba(244, 116, 25, 0.1);
+  transition:
+    transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hw-why-item:hover .hw-why-medallion,
+  .hw-why-item:focus-within .hw-why-medallion {
+    transform: translateY(-4px);
+    box-shadow:
+      0 18px 30px -12px rgba(244, 116, 25, 0.6),
+      0 4px 10px -3px rgba(244, 116, 25, 0.3),
+      inset 0 0 0 1px rgba(244, 116, 25, 0.18);
+  }
+}
+
+/* "No continuous expensive animation on mobile" — the drifting herbs and the
+   rotating sauce are the only always-on loops, and both stop below the
+   tablet breakpoint. The scroll entrance still runs. */
+@media (max-width: 768px) {
+  .hw-why .hw-bob,
+  .hw-why .hw-drift {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hw-why-medallion {
+    transition: none;
+  }
+}
+
+/* Layer placement. The component ships both a phone and a desktop placement
+   as custom properties; this is the only place the breakpoint lives, which
+   keeps the two compositions readable side by side in the JSX. */
+.hw-why-layer {
+  left: var(--hw-why-ml);
+  top: var(--hw-why-mt);
+  width: var(--hw-why-mw);
+}
+
+.hw-why-img {
+  transform: var(--hw-why-rot, none);
+}
+
+@media (min-width: 1024px) {
+  .hw-why-layer {
+    left: var(--hw-why-dl);
+    top: var(--hw-why-dt);
+    width: var(--hw-why-dw);
+  }
+
+  .hw-why-img {
+    transform: var(--hw-why-rot-lg, none);
+  }
+}
+
+/* ------------------------------------------------ order favourite CTA ---
+   The product art uses independent nested transforms in the original. These
+   scoped loops preserve that dimensionality without coupling it to page-level
+   JavaScript or affecting the other Hungry Wrap sections. */
+.hw-order-cta-accent {
+  color: #f4771a;
+  -webkit-text-stroke: 0.018em #f4771a;
+  paint-order: stroke fill;
+  text-shadow:
+    0 2px 0 #e86610,
+    0 7px 15px rgba(232, 102, 16, 0.21),
+    0 0 22px rgba(255, 167, 78, 0.2);
+}
+
+@keyframes hw-order-cta-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hw-order-cta-reveal {
+  animation: hw-order-cta-reveal 700ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+@keyframes hw-order-cta-wrap-float {
+  0%,
+  100% {
+    transform: translate3d(0, -5px, 0) rotate(-1.2deg);
+  }
+  50% {
+    transform: translate3d(0, 8px, 0) rotate(1.1deg);
+  }
+}
+
+@keyframes hw-order-cta-sauce-drift {
+  0%,
+  100% {
+    transform: rotate(-2deg) scale(1);
+  }
+  50% {
+    transform: rotate(3deg) scale(1.025);
+  }
+}
+
+@keyframes hw-order-cta-garnish-float {
+  0%,
+  100% {
+    transform: translate3d(0, -4px, 0) rotate(-1deg);
+  }
+  50% {
+    transform: translate3d(3px, 7px, 0) rotate(1.5deg);
+  }
+}
+
+.hw-order-cta-wrap {
+  animation: hw-order-cta-wrap-float 7.4s ease-in-out infinite;
+}
+
+.hw-order-cta-sauce {
+  animation: hw-order-cta-sauce-drift 16s ease-in-out infinite;
+}
+
+.hw-order-cta-garnish {
+  animation: hw-order-cta-garnish-float 8.7s ease-in-out 0.8s infinite;
+}
+
+@media (max-width: 767px) {
+  .hw-order-cta-button {
+    width: min(100%, 21rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hw-order-cta-reveal,
+  .hw-order-cta-wrap,
+  .hw-order-cta-sauce,
+  .hw-order-cta-garnish {
+    animation: none;
+  }
+
+  .hw-order-cta-button {
+    transition: none;
+  }
+}
+
+/* --------------------------------------------------------- our story ---
+   Scoped reveal and foliage motion for <OurStorySection />. The independent
+   image layers retain their DOM positions, so the art remains adaptable even
+   when movement is disabled by the visitor. */
+.hw-our-story {
+  --hw-story-orange: #f47721;
+}
+
+.hw-our-story-orange {
+  color: var(--hw-story-orange);
+  -webkit-text-stroke: 0.015em var(--hw-story-orange);
+  paint-order: stroke fill;
+  text-shadow: 0 3px 10px rgba(242, 116, 25, 0.17);
+}
+
+@keyframes hw-our-story-reveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hw-our-story-foliage-float {
+  0%,
+  100% {
+    transform: translate3d(0, -5px, 0) rotate(-1deg);
+  }
+  50% {
+    transform: translate3d(3px, 5px, 0) rotate(1deg);
+  }
+}
+
+@keyframes hw-our-story-photo-breathe {
+  0%,
+  100% {
+    transform: scale(1.01);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+.hw-our-story-reveal {
+  animation: hw-our-story-reveal 720ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.hw-our-story-photo {
+  animation: hw-our-story-photo-breathe 15s ease-in-out infinite;
+}
+
+.hw-our-story-foliage {
+  animation: hw-our-story-foliage-float 8.5s ease-in-out infinite;
+}
+
+.hw-our-story-foliage:nth-of-type(2n) {
+  animation-delay: -3.2s;
+  animation-duration: 10.5s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hw-our-story-reveal,
+  .hw-our-story-photo,
+  .hw-our-story-foliage {
+    animation: none;
+  }
+
+  .hw-our-story-button {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------ fresh ingredients ---
+   GSAP owns entrance/parallax transforms on the outer layer. The nested
+   `.hw-fresh-float` element owns its independent drift so the two never fight
+   over the same transform property. */
+.hw-fresh-orange {
+  color: #f36b13;
+  -webkit-text-stroke: 0.018em #f36b13;
+  paint-order: stroke fill;
+  text-shadow: 0 3px 12px rgba(243, 107, 19, 0.2);
+}
+
+@keyframes hw-fresh-float {
+  0%,
+  100% {
+    transform: translate3d(0, calc(var(--hw-fresh-float-y, 8px) * -1), 0) rotate(calc(var(--hw-fresh-float-r, 0deg) * -1));
+  }
+  50% {
+    transform: translate3d(0, var(--hw-fresh-float-y, 8px), 0) rotate(var(--hw-fresh-float-r, 0deg));
+  }
+}
+
+.hw-fresh-float {
+  animation: hw-fresh-float var(--hw-fresh-float-d, 8s) ease-in-out var(--hw-fresh-float-delay, 0s) infinite;
+}
+
+@media (max-width: 767px) {
+  .hw-fresh-float {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hw-fresh-float,
+  .hw-fresh-card {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ----------------------------------------------------------------- menu ---
+   Product images are transparent source PNGs. Their warm inset backdrop is
+   intentionally CSS-only, so every product stays independently replaceable. */
+.hw-menu-accent {
+  color: #f47514;
+  -webkit-text-stroke: 0.014em #f47514;
+  paint-order: stroke fill;
+  text-shadow: 0 3px 12px rgba(244, 117, 20, 0.16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hw-menu-card,
+  .hw-menu-card img,
+  .hw-menu a,
+  .hw-menu button {
+    transition: none;
+  }
+}
+
+/* Below `lg` the wrap has no offscreen to hide its ragged extraction edges
+   in, so it overfills a rounded frame instead. On desktop the frame is inert:
+   same box, no clip, and the section's own overflow does the cropping. */
+.hw-why-frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 1.75rem;
+}
+
+@media (min-width: 1024px) {
+  .hw-why-frame {
+    overflow: visible;
+    border-radius: 0;
+  }
+}
+
+/* The wrap cutout was machine-extracted from the reference screenshot, so its
+   outline ends in straight polygon cuts down the left and across the bottom.
+   Below `lg` the rounded .hw-why-frame clips them. At `lg` the frame is open
+   and, whenever the section is running at its 650px min-height rather than
+   its 2048:819 ratio, the bottom cut lands inside the canvas — so those two
+   edges are feathered into the cream instead. Reads as depth of field, which
+   is what the reference has in the same corner. */
+@media (min-width: 1024px) {
+  .hw-why-wrap-mask {
+    -webkit-mask-image:
+      linear-gradient(to top, transparent 0%, #000 12%),
+      linear-gradient(to right, transparent 0%, #000 8%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to top, transparent 0%, #000 12%),
+      linear-gradient(to right, transparent 0%, #000 8%);
+    mask-composite: intersect;
+  }
+}
+
+/* ------------------------------------------------- testimonials ---
+   The carousel is a real scroll container, so touch momentum, trackpad
+   scrolling and keyboard navigation all come for free. The scrollbar is
+   hidden because the arrow buttons are the visible affordance. */
+.hw-testimonials-track {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  cursor: grab;
+}
+
+.hw-testimonials-track::-webkit-scrollbar {
+  display: none;
+}
+
+.hw-testimonials-track:active {
+  cursor: grabbing;
+}
+
+/* Dragging a card must not start a native text/image selection. */
+.hw-testimonials-track > li {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* The last card aligns to the END of the track, not the start.
+   Snapping every card to `start` puts the final snap position past the
+   container's maximum scroll, so mandatory snapping bounces back and the
+   last review can never be reached or `atEnd` reported. Ending on the last
+   card makes its snap position exactly the maximum scroll. */
+.hw-testimonials-track > li:last-child {
+  scroll-snap-align: end;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hw-testimonials-track {
+    scroll-behavior: auto;
+  }
+}
+
+/* ------------------------------------------------------ compositing ---
+   These eight classes all run infinite `transform` animations, which Chrome
+   already promotes to the compositor on its own while they play. Declaring
+   `will-change` on them as well pinned a layer permanently — including on
+   the narrow screens and under `prefers-reduced-motion`, where the same
+   rules set `animation: none`, so the memory bought nothing. The hint is now
+   scoped to the case it actually helps: a layer that is about to move.
+*/
+@media (prefers-reduced-motion: no-preference) and (min-width: 769px) {
+  .hw-bob,
+  .hw-drift,
+  .hw-fresh-float,
+  .hw-our-story-photo,
+  .hw-our-story-foliage {
+    will-change: transform;
+  }
+}
+
+/* ------------------------------------------------- section seams ---
+   <SectionWave /> paints a section's own background over the bottom edge of
+   the one above. The upward shadow traces the curve (drop-shadow follows the
+   rendered alpha, unlike box-shadow), so each section reads as a panel laid
+   over its neighbour rather than two flat colours butting together. */
+.hw-section-wave {
+  filter: drop-shadow(0 -4px 7px rgba(126, 78, 30, 0.07))
+    drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.55));
+}
