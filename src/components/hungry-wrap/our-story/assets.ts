@@ -16,8 +16,8 @@ const asset = (file: string, width: number, height: number, alt = ""): OurStoryA
 export const OUR_STORY_ASSETS = {
   restaurant: asset(
     "01_restaurant_organic_cutout.png",
-    1920,
-    910,
+    1672,
+    941,
     "A warmly lit restaurant interior concept with The Hungry Wrap sign",
   ),
   leafTop: asset("02_leaf_top.png", 444, 880),
