@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Anton, Baloo_2, Caveat_Brush, Geist, Geist_Mono, Pacifico, Poppins } from "next/font/google";
+import IntroLoader from "@/components/IntroLoader";
+import { INTRO_BOOT_SCRIPT } from "@/lib/intro-boot";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -60,11 +62,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
+    // The boot script may mark <html data-hw-intro> before React hydrates.
     <html
+      suppressHydrationWarning
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${anton.variable} ${pacifico.variable} ${marker.variable} ${baloo.variable} ${poppins.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <script dangerouslySetInnerHTML={{ __html: INTRO_BOOT_SCRIPT }} />
+        <IntroLoader />
+        {children}
+      </body>
     </html>
   );
 }

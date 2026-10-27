@@ -646,3 +646,248 @@ body {
   filter: drop-shadow(0 -4px 7px rgba(126, 78, 30, 0.07))
     drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.55));
 }
+
+/* ------------------------------------------------- inner-page header ---
+   <SiteHeader /> sits outside .hw-hero, so it carries the palette it needs. */
+.hw-nav {
+  --hw-font-ui: var(--font-poppins), system-ui, sans-serif;
+  --hw-orange: #f5811f;
+  --hw-cream: #fdf4e9;
+}
+
+/* ------------------------------------------------------- inner pages ---
+   Effects for the (site) route group. All scoped to .hw-page-* so nothing
+   reaches the landing page. Every loop stops under reduced motion and below
+   the tablet breakpoint, matching the rest of this file. */
+
+/* Lenis owns scrolling on the inner pages. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+/* Warm halo that sits behind each 3D scene and page headline. */
+.hw-page-glow {
+  background: radial-gradient(circle, rgba(255, 177, 92, 0.5) 0%, rgba(255, 177, 92, 0.16) 45%, transparent 70%);
+  animation: hw-page-breathe 7s ease-in-out infinite;
+}
+
+@keyframes hw-page-breathe {
+  0%, 100% { transform: scale(0.94); opacity: 0.85; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+
+/* Three steam wisps rising off the THW Special Chai. */
+.hw-page-steam i {
+  display: block;
+  width: 3px;
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(to top, rgba(244, 117, 20, 0.55), transparent);
+  animation: hw-page-steam 2.2s ease-in-out infinite;
+}
+.hw-page-steam i:nth-child(2) { animation-delay: -0.7s; }
+.hw-page-steam i:nth-child(3) { animation-delay: -1.4s; }
+
+@keyframes hw-page-steam {
+  0% { transform: translateY(6px) scaleY(0.6); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: translateY(-10px) translateX(2px) scaleY(1.1); opacity: 0; }
+}
+
+/* Best Seller: a rotating conic gradient shows through a 3px gap as a moving border. */
+@property --hw-page-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.hw-page-conic {
+  background: conic-gradient(from var(--hw-page-angle), #f47514, #ffd27a, #f2b01e, #f47514 40%, #ffb15c, #f47514);
+  animation: hw-page-spin 4s linear infinite;
+  box-shadow: 0 0 40px -8px rgba(244, 117, 20, 0.55);
+}
+
+@keyframes hw-page-spin {
+  to { --hw-page-angle: 360deg; }
+}
+
+.hw-page-badge {
+  animation: hw-page-wiggle 3.2s ease-in-out infinite;
+}
+
+@keyframes hw-page-wiggle {
+  0%, 82%, 100% { transform: rotate(0deg) scale(1); }
+  86% { transform: rotate(-8deg) scale(1.1); }
+  90% { transform: rotate(7deg) scale(1.1); }
+  94% { transform: rotate(-3deg) scale(1.05); }
+}
+
+/* Brush stroke paints itself in under the About headline. */
+.hw-page-brush {
+  clip-path: inset(0 100% 0 0);
+  animation: hw-page-brush 1s cubic-bezier(0.65, 0, 0.35, 1) 0.9s forwards;
+}
+
+@keyframes hw-page-brush {
+  to { clip-path: inset(0 0 0 0); }
+}
+
+/* FAQ answers glide open instead of snapping (Chromium; others snap). */
+.hw-page-faq {
+  interpolate-size: allow-keywords;
+}
+.hw-page-faq::details-content {
+  height: 0;
+  overflow: clip;
+  opacity: 0;
+  transition: height 380ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 300ms ease, content-visibility 380ms allow-discrete;
+}
+.hw-page-faq[open]::details-content {
+  height: auto;
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .hw-page-glow,
+  .hw-page-badge {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hw-page-glow,
+  .hw-page-steam i,
+  .hw-page-conic,
+  .hw-page-badge {
+    animation: none;
+  }
+  .hw-page-brush {
+    animation: none;
+    clip-path: none;
+  }
+  .hw-page-faq::details-content {
+    transition: none;
+  }
+}
+
+/* --------------------------------------------------------- opener ---
+   <IntroLoader /> is prerendered visible. The boot script hides it before
+   first paint on repeat visits; the failsafe clears it if JS never runs. */
+[data-hw-intro="seen"] .hw-intro {
+  display: none;
+}
+
+.hw-intro {
+  animation: hw-intro-failsafe 0s linear 9s forwards;
+}
+
+@keyframes hw-intro-failsafe {
+  to {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+/* ------------------------------------------------------- menu board ---
+   Category headings in the printed card's style: white type on a rough,
+   slightly tilted brush stroke. */
+.hw-brush {
+  display: inline-block;
+  padding: 0.3em 1.1em 0.35em 0.8em;
+  font-family: var(--font-baloo), var(--font-poppins), system-ui, sans-serif;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: var(--hw-brush, #f47514);
+  clip-path: polygon(1% 12%, 9% 2%, 96% 0%, 100% 34%, 97% 100%, 6% 94%, 0% 62%);
+  transform: rotate(-1.2deg);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+}
+.hw-brush--orange { --hw-brush: linear-gradient(100deg, #f47514, #ff9a3c); }
+.hw-brush--green { --hw-brush: linear-gradient(100deg, #3f8f22, #6ea32e); }
+.hw-brush--red { --hw-brush: linear-gradient(100deg, #e0452b, #f47514); }
+.hw-brush--yellow { --hw-brush: linear-gradient(100deg, #f2b01e, #ffc94a); color: #3a2a12; }
+.hw-brush--blue { --hw-brush: linear-gradient(100deg, #1f6fd1, #3c8ef0); }
+.hw-brush--purple { --hw-brush: linear-gradient(100deg, #6a3fb8, #8f62d8); }
+
+/* Tab strip: swipeable, no visible scrollbar, edges fade so overflow reads. */
+.hw-menu-tabs {
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 14px, #000 calc(100% - 14px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 14px, #000 calc(100% - 14px), transparent);
+  padding-inline: 6px;
+}
+.hw-menu-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* ------------------------------------------------------- 3D stage ---
+   <SceneFrame /> is a sticky band under the header on phones and a tall
+   sticky side panel from `lg` up. The offsets live here so the header, the
+   menu tab bar and the band stack without three unrelated magic numbers. */
+:root {
+  --hw-header-h: 4.25rem;
+  --hw-tabs-h: 4.5rem;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --hw-header-h: 5rem;
+  }
+}
+
+/* Phones: the band holds its own space at the top of the track and pins
+   there, so the list scrolls up behind it. It is opaque for that reason —
+   an alpha canvas over moving text is unreadable. */
+.hw-scene-frame {
+  position: sticky;
+  top: var(--hw-scene-top, var(--hw-header-h));
+  z-index: 20;
+  height: 32svh;
+  min-height: 10.5rem;
+  max-height: 20rem;
+  background: var(--hw-page-bg, #fff9f2);
+  pointer-events: none;
+}
+
+.hw-scene-sticky {
+  position: relative;
+  height: 100%;
+}
+
+/* Softens the seam where page content scrolls under the mobile band. */
+.hw-scene-fade {
+  position: absolute;
+  inset-inline: -1.5rem;
+  bottom: -2rem;
+  height: 2rem;
+  background: linear-gradient(to bottom, var(--hw-page-bg, #fff9f2), transparent);
+}
+
+@media (min-width: 1024px) {
+  .hw-scene-frame {
+    position: relative;
+    top: auto;
+    z-index: 0;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    background: none;
+  }
+
+  .hw-scene-sticky {
+    position: sticky;
+    top: var(--hw-scene-top-lg, 7rem);
+    height: calc(100svh - var(--hw-scene-top-lg, 7rem) - 2rem);
+  }
+}

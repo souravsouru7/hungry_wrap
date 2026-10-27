@@ -1,16 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-import { HERO_ASSETS } from "./assets";
+import { NAV_LINKS as LINKS, ORDER_HREF } from "@/lib/site";
 
-const LINKS = [
-  { label: "Home", href: "#home" },
-  { label: "About Us", href: "#about" },
-  { label: "Specials", href: "#specials" },
-  { label: "Contact Us", href: "#contact" },
-] as const;
+import { HERO_ASSETS } from "./assets";
 
 /** The little takeaway-bag glyph that sits inside both orange CTAs. */
 export function BagIcon({ className = "" }: { className?: string }) {
@@ -37,6 +34,8 @@ export function BagIcon({ className = "" }: { className?: string }) {
  */
 export default function HeroNav() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   return (
     <header className="relative z-50">
@@ -45,7 +44,7 @@ export default function HeroNav() {
         style={{ boxShadow: "0 18px 40px -28px rgba(90, 55, 20, 0.45)" }}
       >
         <div className="flex items-center justify-between gap-4 px-5 py-3 sm:px-8 lg:px-[4vw]">
-          <a href="#home" className="shrink-0">
+          <Link href="/" className="shrink-0">
             <Image
               src={HERO_ASSETS.logo.src}
               alt={HERO_ASSETS.logo.alt}
@@ -57,24 +56,24 @@ export default function HeroNav() {
               fetchPriority="high"
               draggable={false}
             />
-          </a>
+          </Link>
 
-          <nav aria-label="Primary" className="hidden lg:block">
-            <ul className="flex items-center gap-9 font-[family-name:var(--hw-font-ui)] text-[0.95rem] font-medium text-[#3a2c23]">
-              {LINKS.map(({ label, href }, i) => (
+          <nav aria-label="Primary" className="hidden xl:block">
+            <ul className="flex items-center gap-7 font-[family-name:var(--hw-font-ui)] text-[0.95rem] font-medium text-[#3a2c23]">
+              {LINKS.map(({ label, href }) => (
                 <li key={label}>
-                  <a
+                  <Link
                     href={href}
-                    aria-current={i === 0 ? "page" : undefined}
+                    aria-current={isActive(href) ? "page" : undefined}
                     className="group relative inline-block py-1 transition-colors hover:text-[var(--hw-orange)] focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--hw-orange)] aria-[current=page]:text-[var(--hw-orange)]"
                   >
                     {label}
                     <span
                       className={`absolute -bottom-1 left-0 h-[3px] rounded-full bg-[var(--hw-orange)] transition-all duration-300 ${
-                      i === 0 ? "w-full" : "w-0 group-hover:w-full group-focus-visible:w-full"
+                      isActive(href) ? "w-full" : "w-0 group-hover:w-full group-focus-visible:w-full"
                       }`}
                     />
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -82,7 +81,9 @@ export default function HeroNav() {
 
           <div className="flex items-center gap-2">
             <a
-              href="#order"
+              href={ORDER_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
               className="hidden items-center gap-2 rounded-full px-6 py-3 font-[family-name:var(--hw-font-ui)] text-[0.95rem] font-semibold text-white transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_30px_-12px_rgba(224,106,16,0.75)] active:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--hw-orange)] motion-reduce:transition-none sm:inline-flex lg:px-8 lg:py-3.5"
               style={{ background: "linear-gradient(180deg, #fa9231 0%, #f0790f 100%)" }}
             >
@@ -95,7 +96,7 @@ export default function HeroNav() {
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
               aria-controls="hw-mobile-nav"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--hw-cream)] text-[#3a2c23] lg:hidden"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--hw-cream)] text-[#3a2c23] xl:hidden"
             >
               <span className="sr-only">Toggle menu</span>
               <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
@@ -106,22 +107,25 @@ export default function HeroNav() {
         </div>
 
         {open && (
-          <nav id="hw-mobile-nav" aria-label="Primary" className="border-t border-[#f0e0cc] px-5 pb-5 pt-3 lg:hidden">
+          <nav id="hw-mobile-nav" aria-label="Primary" className="border-t border-[#f0e0cc] px-5 pb-5 pt-3 xl:hidden">
             <ul className="flex flex-col gap-1 font-[family-name:var(--hw-font-ui)] text-base font-medium text-[#3a2c23]">
-              {LINKS.map(({ label, href }, i) => (
+              {LINKS.map(({ label, href }) => (
                 <li key={label}>
-                  <a
+                  <Link
                     href={href}
                     onClick={() => setOpen(false)}
-                    className={`block rounded-xl px-3 py-2.5 ${i === 0 ? "bg-[var(--hw-cream)] text-[var(--hw-orange)]" : ""}`}
+                    aria-current={isActive(href) ? "page" : undefined}
+                    className={`block rounded-xl px-3 py-2.5 ${isActive(href) ? "bg-[var(--hw-cream)] text-[var(--hw-orange)]" : ""}`}
                   >
                     {label}
-                  </a>
+                  </Link>
                 </li>
               ))}
               <li className="sm:hidden">
                 <a
-                  href="#order"
+                  href={ORDER_HREF}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="mt-2 flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold text-white"
                   style={{ background: "linear-gradient(180deg, #fa9231 0%, #f0790f 100%)" }}
                 >

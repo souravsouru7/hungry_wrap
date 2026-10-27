@@ -6,6 +6,7 @@ import OrderFavoriteWrapCTA from "@/components/hungry-wrap/order-favorite-wrap-c
 import OurStorySection from "@/components/hungry-wrap/our-story/OurStorySection";
 import TestimonialsSection from "@/components/hungry-wrap/testimonials/TestimonialsSection";
 import WhyChooseUs from "@/components/hungry-wrap/why-choose-us/WhyChooseUs";
+import { NAV_LINKS, ORDER_HREF } from "@/lib/site";
 
 /**
  * The landing page. Each section owns its own backdrop, scroll entrance and
@@ -24,7 +25,7 @@ export default function Home() {
       <OrderFavoriteWrapCTA />
       <TestimonialsSection />
       <OurStorySection />
-      <FinalCtaFooter orderHref="#order" />
+      <FinalCtaFooter orderHref={ORDER_HREF} navLinks={NAV_LINKS} />
     </main>
   );
 }
