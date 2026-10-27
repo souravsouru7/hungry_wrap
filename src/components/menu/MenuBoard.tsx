@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import { useReducedMotion } from "@/lib/reduced-motion";
 import { useEffect, useMemo, useState } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -80,7 +81,7 @@ function CategoryCard({ category, items }: { category: MenuCategory; items: Menu
       layout={!reduce}
       id={category.id}
       aria-labelledby={`${category.id}-heading`}
-      initial={reduce ? false : { opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, transition: { duration: 0.25 } }}
       transition={{ duration: 0.45, ease: [0.2, 0.75, 0.25, 1] }}
@@ -128,7 +129,7 @@ function CategoryCard({ category, items }: { category: MenuCategory; items: Menu
             <motion.li
               key={item.name}
               layout={!reduce}
-              initial={reduce ? false : { opacity: 0, x: -12 }}
+              initial={{ opacity: 0, x: -12 }}
               animate={{ opacity: 1, x: 0 }}
               exit={reduce ? { opacity: 0 } : { opacity: 0, x: 12, transition: { duration: 0.18 } }}
               transition={{ duration: 0.3 }}

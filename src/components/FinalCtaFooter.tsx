@@ -3,9 +3,12 @@
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { FormEvent, ReactNode } from "react";
-import { ArrowRight, Camera, ChefHat, Heart, Leaf, MessageCircle, Play, Smile, Sparkles } from "lucide-react";
+import { ArrowRight, Camera, ChefHat, Heart, Leaf, MapPin, Smile, Sparkles } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+import { BRAND_LOGO } from "@/components/hungry-wrap/exact-hero/assets";
+import { SITE } from "@/lib/site";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -33,13 +36,18 @@ const DEFAULT_NAV_LINKS: NavLink[] = [
   { label: "Contact Us", href: "#contact" },
 ];
 
-const SOCIALS = ["Instagram", "Facebook", "YouTube", "WhatsApp"] as const;
+const SOCIALS = ["Instagram"] as const;
+
+const DEFAULT_SOCIAL_LINKS: SocialLink[] = [{ platform: "Instagram", href: SITE.links.instagram }];
+
+const DELIVERY_LINKS = [
+  { label: "Order on Swiggy", href: SITE.links.swiggy, className: "bg-[#fc8019] text-white" },
+  { label: "Order on Zomato", href: SITE.links.zomato, className: "bg-[#e23744] text-white" },
+] as const;
 
 function SocialGlyph({ platform }: { platform: string }) {
   const normalized = platform.toLowerCase();
   if (normalized === "instagram") return <Camera aria-hidden className="h-4 w-4" strokeWidth={2.5} />;
-  if (normalized === "youtube") return <Play aria-hidden className="h-4 w-4 fill-current" strokeWidth={2.5} />;
-  if (normalized === "whatsapp") return <MessageCircle aria-hidden className="h-4 w-4" strokeWidth={2.5} />;
   return <span aria-hidden className="font-[family-name:var(--font-poppins)] text-base font-bold leading-none">f</span>;
 }
 
@@ -61,10 +69,10 @@ function Benefit({ icon, label, tone = "yellow" }: { icon: ReactNode; label: Rea
  * caller-owned: no social destination or subscription success is fabricated.
  */
 export default function FinalCtaFooter({
-  logoSrc = "/assets/hero/01_logo_lockup.png",
+  logoSrc = BRAND_LOGO.src,
   orderHref,
   navLinks = DEFAULT_NAV_LINKS,
-  socialLinks = [],
+  socialLinks = DEFAULT_SOCIAL_LINKS,
   onSubscribe,
 }: FinalCtaFooterProps) {
   const root = useRef<HTMLElement>(null);
@@ -152,7 +160,7 @@ export default function FinalCtaFooter({
               <path d="M5 37c29 15 65 18 94 1" />
               <path d="m83 21 18 17-22 11" />
             </svg>
-            <a href={orderHref} className="group inline-flex min-h-16 items-center justify-center gap-3 rounded-full bg-white px-10 font-[family-name:var(--font-poppins)] text-[1.08rem] font-bold text-[#f47514] shadow-[0_14px_24px_-14px_rgba(93,30,0,.65)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_29px_-16px_rgba(93,30,0,.72)] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-white">
+            <a href={orderHref} target="_blank" rel="noopener noreferrer" className="group inline-flex min-h-16 items-center justify-center gap-3 rounded-full bg-white px-10 font-[family-name:var(--font-poppins)] text-[1.08rem] font-bold text-[#f47514] shadow-[0_14px_24px_-14px_rgba(93,30,0,.65)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_29px_-16px_rgba(93,30,0,.72)] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-white">
               Order Now
               <Sparkles aria-hidden className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12" strokeWidth={2.5} />
             </a>
@@ -170,15 +178,7 @@ export default function FinalCtaFooter({
       <div className="mx-auto max-w-[1720px] px-5 py-12 sm:px-8 lg:px-12 lg:py-14">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.35fr_.72fr_.9fr_1.25fr] lg:gap-12">
           <section aria-label="The Hungry Wrap brand" className="max-w-[20rem]">
-            <div className="flex items-center gap-4">
-              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#ffead4] p-2 shadow-[inset_0_0_0_1px_rgba(244,117,20,.08)]">
-                <Image src={logoSrc} alt="The Hungry Wrap" width={1883} height={538} sizes="64px" className="h-auto w-full object-contain" />
-              </span>
-              <div className="font-[family-name:var(--font-baloo)] leading-[.85] tracking-[-.04em]">
-                <p className="text-[1.4rem] font-extrabold text-[#f47514]">The Hungry</p>
-                <p className="mt-1 text-[1.8rem] font-extrabold text-[#211b18]">Wrap</p>
-              </div>
-            </div>
+            <Image src={logoSrc} alt="The Hungry Wrap" width={BRAND_LOGO.width} height={BRAND_LOGO.height} sizes="160px" className="h-auto w-36 object-contain sm:w-40" />
             <p className="mt-4 font-[family-name:var(--font-poppins)] text-[.82rem] leading-relaxed text-[#77716c]">Wraps so good, you&apos;ll come back for more!</p>
           </section>
 
@@ -196,13 +196,24 @@ export default function FinalCtaFooter({
                 const href = socialByPlatform.get(platform.toLowerCase());
                 const colors: Record<string, string> = {
                   Instagram: "bg-[linear-gradient(135deg,#ef6d53,#ff9e35)] text-white",
-                  Facebook: "bg-[#5e5b5a] text-white",
-                  YouTube: "bg-white text-[#ef4e38] ring-1 ring-[#f0e4d9]",
-                  WhatsApp: "bg-[#61b94f] text-white",
                 };
                 const className = `inline-flex h-10 w-10 items-center justify-center rounded-full transition duration-300 hover:scale-105 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#f47514] ${colors[platform]}`;
-                return <li key={platform}>{href ? <a href={href} className={className} aria-label={platform}><SocialGlyph platform={platform} /></a> : <span className={`${className} cursor-not-allowed opacity-55`} aria-label={`${platform} link not configured`} aria-disabled="true" title={`${platform} link not configured`}><SocialGlyph platform={platform} /></span>}</li>;
+                return <li key={platform}>{href ? <a href={href} target="_blank" rel="noopener noreferrer" className={className} aria-label={platform}><SocialGlyph platform={platform} /></a> : <span className={`${className} cursor-not-allowed opacity-55`} aria-label={`${platform} link not configured`} aria-disabled="true" title={`${platform} link not configured`}><SocialGlyph platform={platform} /></span>}</li>;
               })}
+            </ul>
+
+            <h3 className="mt-7 font-[family-name:var(--font-baloo)] text-[1.15rem] font-bold">Find Us</h3>
+            <address className="mt-3 flex gap-2 font-[family-name:var(--font-poppins)] text-[.88rem] leading-relaxed text-[#77716c] not-italic">
+              <MapPin aria-hidden className="mt-1 h-4 w-4 shrink-0 text-[#f47514]" strokeWidth={2.5} />
+              <span>
+                {SITE.address}
+                <a href={SITE.links.maps} target="_blank" rel="noopener noreferrer" className="mt-1 block font-semibold text-[#f47514] decoration-2 underline-offset-4 hover:underline focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f47514]">Get directions</a>
+              </span>
+            </address>
+            <ul className="mt-4 flex flex-wrap gap-2">
+              {DELIVERY_LINKS.map(({ label, href, className }) => (
+                <li key={label}><a href={href} target="_blank" rel="noopener noreferrer" className={`inline-flex min-h-10 items-center rounded-full px-4 font-[family-name:var(--font-poppins)] text-[.78rem] font-semibold transition duration-300 hover:scale-105 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#f47514] ${className}`}>{label}</a></li>
+              ))}
             </ul>
           </section>
 
@@ -212,8 +223,9 @@ export default function FinalCtaFooter({
             <form className="mt-4" onSubmit={submit} noValidate>
               <label htmlFor="footer-email" className="sr-only">Email address</label>
               <div className="flex min-h-13 items-center rounded-full bg-white p-1.5 shadow-[0_8px_20px_-15px_rgba(70,45,26,.45)] ring-1 ring-[#f0e5da] focus-within:ring-2 focus-within:ring-[#f47514]">
-                <input id="footer-email" name="email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Your email address" className="min-w-0 flex-1 bg-transparent px-4 font-[family-name:var(--font-poppins)] text-[.88rem] text-[#211b18] outline-none placeholder:text-[#a39a93]" />
-                <button type="submit" disabled={isSubmitting} className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f47514] text-white shadow-[0_7px_13px_-7px_rgba(184,70,0,.75)] transition hover:scale-105 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#f47514]" aria-label="Subscribe to updates">
+                {/* suppressHydrationWarning: form-filler extensions (e.g. Edge's `fdprocessedid`) tag inputs before React hydrates. */}
+                <input suppressHydrationWarning id="footer-email" name="email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Your email address" className="min-w-0 flex-1 bg-transparent px-4 font-[family-name:var(--font-poppins)] text-[.88rem] text-[#211b18] outline-none placeholder:text-[#a39a93]" />
+                <button suppressHydrationWarning type="submit" disabled={isSubmitting} className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f47514] text-white shadow-[0_7px_13px_-7px_rgba(184,70,0,.75)] transition hover:scale-105 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#f47514]" aria-label="Subscribe to updates">
                   <ArrowRight aria-hidden className="h-5 w-5" strokeWidth={2.8} />
                 </button>
               </div>

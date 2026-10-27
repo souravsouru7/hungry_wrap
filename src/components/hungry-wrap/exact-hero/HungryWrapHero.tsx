@@ -3,6 +3,8 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 
+import { ORDER_HREF } from "@/lib/site";
+
 import { HERO_ASSETS } from "./assets";
 import CustomerBadge from "./CustomerBadge";
 import FeatureStrip from "./FeatureStrip";
@@ -244,7 +246,9 @@ export default function HungryWrapHero() {
               className="mt-6 flex w-full flex-col gap-3.5 sm:w-auto sm:flex-row"
             >
               <a
-                href="#order"
+                href={ORDER_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2.5 rounded-full px-8 py-4 font-[family-name:var(--hw-font-ui)] text-base font-semibold text-white transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_22px_36px_-14px_rgba(224,106,16,0.8)] active:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--hw-orange)] motion-reduce:transition-none"
                 style={{ background: "linear-gradient(180deg, #fa9231 0%, #ef780e 100%)" }}
               >

@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ArrowUpRight, ShoppingBag, Sparkles } from "lucide-react";
 import { ORDER_CTA_ASSETS } from "./assets";
 import SectionWave from "@/components/hungry-wrap/SectionWave";
+import { ORDER_HREF } from "@/lib/site";
 
 type OrderFavoriteWrapCTAProps = {
   /** Destination for the primary ordering action. */
@@ -40,7 +41,7 @@ function ArtLayer({ asset, className, priority = false }: ArtLayerProps) {
  * stage beneath it.
  */
 export default function OrderFavoriteWrapCTA({
-  orderHref = "#order",
+  orderHref = ORDER_HREF,
   menuHref = "#menu",
   className = "",
 }: OrderFavoriteWrapCTAProps) {
@@ -88,6 +89,8 @@ export default function OrderFavoriteWrapCTA({
           >
             <a
               href={orderHref}
+              target="_blank"
+              rel="noopener noreferrer"
               className="hw-order-cta-button group inline-flex min-h-14 items-center justify-center gap-2.5 rounded-full bg-[#f87b18] px-8 font-[family-name:var(--font-poppins)] text-[1.02rem] font-bold text-white shadow-[0_9px_0_#db6010,0_17px_24px_rgba(217,95,15,0.22)] transition duration-300 hover:-translate-y-1 hover:bg-[#ff8525] hover:shadow-[0_11px_0_#db6010,0_22px_28px_rgba(217,95,15,0.28)] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[#f87b18]"
             >
               Order Now

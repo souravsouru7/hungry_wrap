@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
+import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
+import { useReducedMotion } from "@/lib/reduced-motion";
 import type { MotionValue } from "motion/react";
 import { useEffect } from "react";
 
@@ -83,7 +84,7 @@ export default function FloatingFood() {
       {PIECES.map((piece, i) => (
         <motion.div
           key={i}
-          initial={reduce ? false : { opacity: 0, scale: 0.4, rotate: -30 }}
+          initial={{ opacity: 0, scale: 0.4, rotate: -30 }}
           animate={go ? { opacity: 1, scale: 1, rotate: 0 } : undefined}
           transition={{ type: "spring", stiffness: 120, damping: 12, delay: 0.5 + i * 0.09 }}
           className="absolute inset-0"

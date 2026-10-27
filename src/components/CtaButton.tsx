@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import { motion, useMotionValue, useSpring } from "motion/react";
+import { useReducedMotion } from "@/lib/reduced-motion";
 import type { PointerEvent, ReactNode } from "react";
 
 import { BagIcon } from "@/components/SiteHeader";

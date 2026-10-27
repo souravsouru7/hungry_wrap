@@ -1,13 +1,19 @@
 /**
  * Every site-wide constant lives here so the real cafe details are filled in
  * exactly once. The `TODO:` strings below are the only values still outstanding —
- * replacing them is all that stands between the CTAs and a working phone number.
+ * replacing them is all that stands between the WhatsApp CTAs and a working number.
  */
 export const SITE = {
   name: "The Hungry Wrap",
   url: "https://thehungrywrap.in", // TODO: confirm the real domain (metadataBase + sitemap)
   tagline: "Fresh Food. Hot Tea. Happy Pockets.",
-  address: "TODO: full Kalpetta address / landmark",
+  address: "Vasudev Nagar Metro Station, Near, Hingna Rd, Rajendra Nagar, Nagpur, Maharashtra 440036",
+  links: {
+    maps: "https://maps.app.goo.gl/bJHCZkiBH6k9jYxg9",
+    instagram: "https://www.instagram.com/thehungrywrap/",
+    swiggy: "https://www.swiggy.com/city/nagpur/the-hungry-wrap-pratap-nagar-rest1410251",
+    zomato: "https://www.zomato.com/nagpur/the-hungry-wrap-1-hingna-t-point",
+  },
   phone: "TODO: +91XXXXXXXXXX",
   /** Digits only, with country code and no `+` — the format wa.me expects. */
   whatsapp: "TODO: 91XXXXXXXXXX",
@@ -30,14 +36,13 @@ export const NAV_LINKS: NavLink[] = [
   { label: "Contact Us", href: "/contact" },
 ];
 
-/** Prefilled WhatsApp deep link. Every order and subscribe CTA goes through this. */
+/** Prefilled WhatsApp deep link. The subscribe CTAs and the contact form go through this. */
 export function whatsappUrl(message: string): string {
   return `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(message)}`;
 }
 
-export const ORDER_HREF = whatsappUrl(
-  "Hi! I'd like to place an order from The Hungry Wrap.",
-);
+/** Every "Order Now" button opens the Swiggy listing. */
+export const ORDER_HREF = SITE.links.swiggy;
 
 export const TEL_HREF = `tel:${SITE.phone}`;
 export const MAIL_HREF = `mailto:${SITE.email}`;

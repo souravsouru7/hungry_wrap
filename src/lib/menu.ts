@@ -149,10 +149,54 @@ export const MENU_PHASE_STARTS = ["steamy-momos", "fried-momos", "kurkura-momos"
 
 /** Signature-roll art shown at the head of each roll category. */
 export const ROLL_ART: Record<string, { src: string; alt: string }> = {
-  "veg-rolls": { src: "/images/menu/03_paneer_delight.png", alt: "A paneer kathi roll" },
-  "chicken-rolls": { src: "/images/menu/02_spicy_chicken.png", alt: "A spicy chicken kathi roll" },
-  "egg-rolls": { src: "/images/menu/01_chicken_classic.png", alt: "A loaded kathi roll" },
+  "veg-rolls": { src: "/home/menu-paneer.webp", alt: "A paneer kathi roll" },
+  "chicken-rolls": { src: "/home/menu-spicy-chicken.webp", alt: "A spicy chicken kathi roll" },
+  "egg-rolls": { src: "/home/menu-chicken.webp", alt: "A loaded kathi roll" },
 };
+
+export type FeaturedItem = MenuItem & {
+  categoryId: string;
+  blurb: string;
+  image: string;
+};
+
+const FEATURED_PICKS = [
+  { name: "Chicken Roll", categoryId: "chicken-rolls", image: "/home/menu-chicken.webp", blurb: "Juicy chicken, crunchy veggies and our house sauce." },
+  { name: "Chilly Chicken Roll", categoryId: "chicken-rolls", image: "/home/menu-spicy-chicken.webp", blurb: "Indo-Chinese heat, rolled tight. For the spice lovers." },
+  { name: "Paneer Roll", categoryId: "veg-rolls", image: "/home/menu-paneer.webp", blurb: "Soft paneer tossed in spices with onion and mint." },
+  { name: "Mix Veg Roll", categoryId: "veg-rolls", image: "/home/menu-veg.webp", blurb: "A colourful crunch of fresh veggies. Light and filling." },
+];
+
+/**
+ * Bestsellers shown on the landing page. Only the photo and blurb live here;
+ * name, price and diet are read from MENU so the two can never disagree.
+ */
+export const FEATURED: FeaturedItem[] = FEATURED_PICKS.map((pick) => {
+  const item = MENU.find((c) => c.id === pick.categoryId)?.items.find((i) => i.name === pick.name);
+  if (!item) throw new Error(`Featured item "${pick.name}" is not on the menu`);
+  return { ...item, ...pick };
+});
+
+export type MenuGroup = { title: string; href: string; count: number; from: number; categoryIds: string[] };
+
+const GROUPS = [
+  { title: "Kathi Rolls", ids: ["veg-rolls", "chicken-rolls", "egg-rolls"] },
+  { title: "Momos", ids: ["steamy-momos", "fried-momos", "kurkura-momos"] },
+  { title: "Chai & Coffee", ids: ["beverages"] },
+  { title: "Bun Maska & Maggie", ids: ["breads-maggie"] },
+];
+
+/** Category tiles on the landing page, each deep-linking into /menu. */
+export const MENU_GROUPS: MenuGroup[] = GROUPS.map(({ title, ids }) => {
+  const items = MENU.filter((c) => ids.includes(c.id)).flatMap((c) => c.items);
+  return {
+    title,
+    href: `/menu#${ids[0]}`,
+    count: items.length,
+    from: Math.min(...items.flatMap((i) => i.prices)),
+    categoryIds: ids,
+  };
+});
 
 /** The one item that gets steam wisps. */
 export const SIGNATURE_CHAI = "THW Special Chai";

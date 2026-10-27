@@ -4,7 +4,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 
-import { HERO_ASSETS } from "@/components/hungry-wrap/exact-hero/assets";
+import { BRAND_LOGO, HERO_ASSETS } from "@/components/hungry-wrap/exact-hero/assets";
 import { FRESH_INGREDIENT_ASSETS as F } from "@/components/hungry-wrap/fresh-ingredients/assets";
 import { markIntroDone, useIntroDone } from "@/lib/intro";
 
@@ -29,16 +29,11 @@ const FILLINGS = [
 ];
 
 // stage 0: tortilla · 1–2: fillings drop · 3: roll → wrap · 4: brand · 5: exit
-const TIMELINE = [0, 650, 1150, 1800, 2500];
-const MIN_MS = 3200;
-const MAX_MS = 6500;
-
-function pageLoaded() {
-  return new Promise<void>((resolve) => {
-    if (document.readyState === "complete") resolve();
-    else window.addEventListener("load", () => resolve(), { once: true });
-  });
-}
+// Kept short on purpose: the curtain waits for fonts only, not for every image
+// on the page, so it never holds a visitor back on a slow connection.
+const TIMELINE = [0, 300, 550, 900, 1250];
+const MIN_MS = 1600;
+const MAX_MS = 2500;
 
 export default function IntroLoader() {
   const done = useIntroDone();
@@ -55,7 +50,7 @@ export default function IntroLoader() {
     const minWait = new Promise((r) => window.setTimeout(r, MIN_MS));
     const maxWait = new Promise((r) => window.setTimeout(r, MAX_MS));
     let cancelled = false;
-    Promise.race([Promise.all([minWait, pageLoaded(), document.fonts?.ready]), maxWait]).then(() => {
+    Promise.race([Promise.all([minWait, document.fonts?.ready]), maxWait]).then(() => {
       if (!cancelled) setLeaving(true);
     });
 
@@ -164,16 +159,16 @@ export default function IntroLoader() {
 
           {/* The brand lands */}
           <motion.div
-            className="relative mt-2 h-[clamp(3rem,9vw,4.5rem)]"
+            className="relative mt-2 h-[clamp(6rem,20vw,8.5rem)]"
             initial={{ opacity: 0, y: 24, scale: 0.9 }}
             animate={stage >= 4 ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 24, scale: 0.9 }}
             transition={{ type: "spring", stiffness: 200, damping: 16 }}
           >
             <Image
-              src={HERO_ASSETS.logo.src}
+              src={BRAND_LOGO.src}
               alt="The Hungry Wrap"
-              width={HERO_ASSETS.logo.width}
-              height={HERO_ASSETS.logo.height}
+              width={BRAND_LOGO.width}
+              height={BRAND_LOGO.height}
               sizes="280px"
               preload
               className="h-full w-auto"

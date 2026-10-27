@@ -20,9 +20,13 @@ const asset = (file: string, width: number, height: number, alt: string): HeroAs
   alt,
 });
 
+/** Mascot-only mark for the navbar, trimmed from the supplied favicon art. */
+export const BRAND_MARK: HeroAsset = { src: "/brand/mark.png", width: 360, height: 245, alt: "The Hungry Wrap" };
+
+/** Full stacked logo (mascot + wordmark), trimmed from the supplied logo art. */
+export const BRAND_LOGO: HeroAsset = { src: "/brand/logo.png", width: 640, height: 559, alt: "The Hungry Wrap" };
+
 export const HERO_ASSETS = {
-  /** Top-left brand lockup in the navbar. */
-  logo: asset("01_logo_lockup.png", 1883, 538, "The Hungry Wrap"),
   /** The product itself — the anchor of the right-hand composition. */
   wrap: asset("02_main_wrap.png", 1069, 1149, "A chicken wrap in branded paper, overflowing with filling"),
   /** Glossy sauce ribbon that loops around the product. */

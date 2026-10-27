@@ -5,9 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-import { NAV_LINKS as LINKS, ORDER_HREF } from "@/lib/site";
+import { NAV_LINKS as LINKS, ORDER_HREF, SITE } from "@/lib/site";
 
-import { HERO_ASSETS } from "./assets";
+import { BRAND_MARK } from "./assets";
 
 /** The little takeaway-bag glyph that sits inside both orange CTAs. */
 export function BagIcon({ className = "" }: { className?: string }) {
@@ -44,18 +44,22 @@ export default function HeroNav() {
         style={{ boxShadow: "0 18px 40px -28px rgba(90, 55, 20, 0.45)" }}
       >
         <div className="flex items-center justify-between gap-4 px-5 py-3 sm:px-8 lg:px-[4vw]">
-          <Link href="/" className="shrink-0">
+          <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label={`${SITE.name} home`}>
             <Image
-              src={HERO_ASSETS.logo.src}
-              alt={HERO_ASSETS.logo.alt}
-              width={HERO_ASSETS.logo.width}
-              height={HERO_ASSETS.logo.height}
-              sizes="(max-width: 640px) 150px, 230px"
-              className="h-auto w-[150px] select-none sm:w-[200px] lg:w-[230px]"
+              src={BRAND_MARK.src}
+              alt=""
+              width={BRAND_MARK.width}
+              height={BRAND_MARK.height}
+              sizes="80px"
+              className="h-auto w-[54px] select-none sm:w-[64px]"
               loading="eager"
               fetchPriority="high"
               draggable={false}
             />
+            <span className="font-[family-name:var(--font-baloo)] text-[1.35rem] leading-[.85] font-extrabold tracking-[-.03em] text-[#f47514] sm:text-[1.6rem]">
+              The Hungry
+              <span className="mt-0.5 block text-[#211b18]">Wrap</span>
+            </span>
           </Link>
 
           <nav aria-label="Primary" className="hidden xl:block">

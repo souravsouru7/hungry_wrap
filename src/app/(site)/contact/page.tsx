@@ -7,12 +7,12 @@ import Reveal from "@/components/Reveal";
 import TiltCard from "@/components/motion/TiltCard";
 import SceneFrame from "@/components/three/SceneFrame";
 import { HERO_ASSETS } from "@/components/hungry-wrap/exact-hero/assets";
-import { MAIL_HREF, NAV_LINKS, ORDER_HREF, SITE, TEL_HREF, whatsappUrl } from "@/lib/site";
+import { NAV_LINKS, ORDER_HREF, SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: { absolute: "Contact Us | Location, Hours & Phone Number | Hungry Wrap" },
+  title: { absolute: "Contact Us | Location, Hours & Delivery | The Hungry Wrap Nagpur" },
   description:
-    "Get in touch with Hungry Wrap Cafe. Find our location, phone number, opening hours, and email address. Order ahead or drop by for fresh food and tea!",
+    "Find The Hungry Wrap near Vasudev Nagar Metro Station, Hingna Road, Nagpur. See opening hours and order on Swiggy or Zomato. Fresh wraps made to order!",
 };
 
 const link = "underline decoration-[#f47514] decoration-2 underline-offset-4 transition-colors hover:text-[#f47514]";
@@ -46,6 +46,11 @@ export default function ContactPage() {
                 <p className="mt-3">
                   <strong className="text-[#211b18]">Address:</strong> {SITE.address}
                 </p>
+                <p className="mt-2">
+                  <a className={link} href={SITE.links.maps} target="_blank" rel="noopener noreferrer">
+                    Get directions on Google Maps
+                  </a>
+                </p>
                 <h3 className="mt-5 font-semibold text-[#211b18]">Opening Hours</h3>
                 <ul className="mt-2 space-y-1.5">
                   {SITE.hours.map((h) => (
@@ -65,21 +70,19 @@ export default function ContactPage() {
                 <h2 className={h2}>Get in Touch</h2>
                 <ul className="mt-3 space-y-2">
                   <li>
-                    <strong className="text-[#211b18]">Phone / Delivery Orders:</strong>{" "}
-                    <a className={link} href={TEL_HREF}>
-                      {SITE.phone}
+                    <strong className="text-[#211b18]">Delivery Orders:</strong>{" "}
+                    <a className={link} href={SITE.links.swiggy} target="_blank" rel="noopener noreferrer">
+                      Swiggy
+                    </a>
+                    {" · "}
+                    <a className={link} href={SITE.links.zomato} target="_blank" rel="noopener noreferrer">
+                      Zomato
                     </a>
                   </li>
                   <li>
-                    <strong className="text-[#211b18]">WhatsApp:</strong>{" "}
-                    <a className={link} href={whatsappUrl("Hi!")} target="_blank" rel="noopener noreferrer">
-                      {SITE.whatsapp}
-                    </a>
-                  </li>
-                  <li>
-                    <strong className="text-[#211b18]">Email:</strong>{" "}
-                    <a className={link} href={MAIL_HREF}>
-                      {SITE.email}
+                    <strong className="text-[#211b18]">Instagram:</strong>{" "}
+                    <a className={link} href={SITE.links.instagram} target="_blank" rel="noopener noreferrer">
+                      @thehungrywrap
                     </a>
                   </li>
                 </ul>

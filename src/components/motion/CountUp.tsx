@@ -1,6 +1,7 @@
 "use client";
 
-import { animate, useInView, useReducedMotion } from "motion/react";
+import { animate, useInView } from "motion/react";
+import { useReducedMotion } from "@/lib/reduced-motion";
 import { useEffect, useRef, useState } from "react";
 
 /** Counts from 0 to `to` the first time it scrolls into view. */

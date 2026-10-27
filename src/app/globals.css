@@ -157,6 +157,43 @@ body {
   animation: hw-drift var(--hw-bob-d, 14s) ease-in-out infinite;
 }
 
+/* Landing hero cutouts: a gentle transform-only float, nothing that repaints. */
+@keyframes hw-home-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--r, 0deg));
+  }
+  50% {
+    transform: translate3d(0, -10px, 0) rotate(var(--r, 0deg));
+  }
+}
+
+.hw-home-float {
+  animation: hw-home-float 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* A light sweep across the primary CTA every few seconds. */
+@keyframes hw-shine {
+  0%,
+  65% {
+    transform: translateX(-120%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(220%) skewX(-20deg);
+  }
+}
+
+.hw-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  animation: hw-shine 3.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
 .hw-feature-icon {
   transition: transform 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -169,7 +206,9 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .hw-bob,
-  .hw-drift {
+  .hw-drift,
+  .hw-home-float,
+  .hw-shine::after {
     animation: none;
   }
 

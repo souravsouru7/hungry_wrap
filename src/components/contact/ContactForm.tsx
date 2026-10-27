@@ -1,6 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import { useReducedMotion } from "@/lib/reduced-motion";
 import { useState } from "react";
 import type { FormEvent } from "react";
 
@@ -40,24 +41,26 @@ export default function ContactForm() {
   return (
     <form onSubmit={submit} noValidate className="mt-5 space-y-4">
       <div className="relative">
-        <input id="cf-name" name="name" required autoComplete="name" placeholder="Name" className={input} />
+        {/* suppressHydrationWarning: form-filler extensions (e.g. Edge's `fdprocessedid`) tag fields before React hydrates. */}
+        <input suppressHydrationWarning id="cf-name" name="name" required autoComplete="name" placeholder="Name" className={input} />
         <label htmlFor="cf-name" className={label}>
           Name
         </label>
       </div>
       <div className="relative">
-        <input id="cf-phone" name="phone" type="tel" required autoComplete="tel" placeholder="Phone Number" className={input} />
+        <input suppressHydrationWarning id="cf-phone" name="phone" type="tel" required autoComplete="tel" placeholder="Phone Number" className={input} />
         <label htmlFor="cf-phone" className={label}>
           Phone Number
         </label>
       </div>
       <div className="relative">
-        <textarea id="cf-message" name="message" required rows={5} placeholder="Message" className={`${input} resize-none`} />
+        <textarea suppressHydrationWarning id="cf-message" name="message" required rows={5} placeholder="Message" className={`${input} resize-none`} />
         <label htmlFor="cf-message" className={label}>
           Message
         </label>
       </div>
       <motion.button
+        suppressHydrationWarning
         type="submit"
         whileHover={reduce ? undefined : { scale: 1.03 }}
         whileTap={reduce ? undefined : { scale: 0.96 }}
@@ -70,7 +73,7 @@ export default function ContactForm() {
             <motion.span
               key={sent}
               className="absolute inset-0"
-              initial={reduce ? false : { x: -24, y: 24, opacity: 0 }}
+              initial={{ x: -24, y: 24, opacity: 0 }}
               animate={{ x: 0, y: 0, opacity: 1 }}
               exit={reduce ? { opacity: 0 } : { x: 60, y: -60, rotate: 20, opacity: 0, transition: { duration: 0.6, ease: "easeIn" } }}
               transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.35 }}

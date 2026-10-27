@@ -3,11 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 
 import { useIntroDone } from "@/lib/intro";
-import { NAV_LINKS, ORDER_HREF } from "@/lib/site";
+import { BRAND_MARK } from "@/components/hungry-wrap/exact-hero/assets";
+import { NAV_LINKS, ORDER_HREF, SITE } from "@/lib/site";
 
 /** The little takeaway-bag glyph that sits inside the orange CTAs. */
 export function BagIcon({ className = "" }: { className?: string }) {
@@ -37,7 +38,6 @@ const CTA_BG = "linear-gradient(180deg, #fa9231 0%, #f0790f 100%)";
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const reduce = useReducedMotion();
   const go = useIntroDone();
   const [scrolled, setScrolled] = useState(false);
 
@@ -51,7 +51,7 @@ export default function SiteHeader() {
   return (
     <motion.header
       className="hw-nav sticky top-0 z-50"
-      initial={reduce ? false : { y: -90, opacity: 0 }}
+      initial={{ y: -90, opacity: 0 }}
       animate={go ? { y: 0, opacity: 1 } : undefined}
       transition={{ duration: 0.6, ease: [0.2, 0.75, 0.25, 1] }}
     >
@@ -68,20 +68,28 @@ export default function SiteHeader() {
             scrolled ? "py-1.5" : "py-3"
           }`}
         >
-          <Link href="/" className="shrink-0">
+          <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label={`${SITE.name} home`}>
             <Image
-              src="/assets/hero/01_logo_lockup.png"
-              alt="The Hungry Wrap"
-              width={1883}
-              height={538}
-              sizes="(max-width: 640px) 150px, 230px"
+              src={BRAND_MARK.src}
+              alt=""
+              width={BRAND_MARK.width}
+              height={BRAND_MARK.height}
+              sizes="80px"
               className={`h-auto select-none transition-[width] duration-500 ${
-                scrolled ? "w-[130px] sm:w-[160px] lg:w-[180px]" : "w-[150px] sm:w-[200px] lg:w-[230px]"
+                scrolled ? "w-[46px] sm:w-[54px]" : "w-[54px] sm:w-[64px]"
               }`}
               loading="eager"
               fetchPriority="high"
               draggable={false}
             />
+            <span
+              className={`font-[family-name:var(--font-baloo)] leading-[.85] font-extrabold tracking-[-.03em] text-[#f47514] transition-[font-size] duration-500 ${
+                scrolled ? "text-[1.2rem] sm:text-[1.4rem]" : "text-[1.35rem] sm:text-[1.6rem]"
+              }`}
+            >
+              The Hungry
+              <span className="mt-0.5 block text-[#211b18]">Wrap</span>
+            </span>
           </Link>
 
           <nav aria-label="Primary" className="hidden xl:block">
