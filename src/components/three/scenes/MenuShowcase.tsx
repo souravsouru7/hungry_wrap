@@ -4,8 +4,9 @@ import { ContactShadows } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 
-import { BRAND, seeded, smooth, span, windowed, type SceneProps } from "../util";
+import { seeded, smooth, span, windowed, type SceneProps } from "../util";
 import { useFitCamera } from "../useFitCamera";
 import { ChaiCupModel } from "./ChaiCup";
 import MomoSteamer from "./MomoSteamer";
@@ -15,39 +16,171 @@ import MomoSteamer from "./MomoSteamer";
 const TORTILLA_LENGTH = 2.6;
 const TORTILLA_WIDTH = 3.3;
 
-/** A toasted tortilla, painted once onto a canvas: warm base, scorch spots, grill bars. */
-function useTortillaTexture() {
+const SIZE = 1024;
+
+/**
+ * A tawa-toasted paratha, painted once onto two canvases: colour (mottled dough,
+ * flour specks, brown blisters with charred cores) and a matching bump map so
+ * the blisters catch the light.
+ */
+function useTortillaMaps() {
   return useMemo(() => {
-    const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = 512;
-    const ctx = canvas.getContext("2d")!;
-    ctx.fillStyle = "#f0cf8e";
-    ctx.fillRect(0, 0, 512, 512);
+    const make = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = SIZE;
+      return [canvas, canvas.getContext("2d")!] as const;
+    };
+    const [colorCanvas, c] = make();
+    const [bumpCanvas, b] = make();
     const rand = seeded(11);
-    for (let i = 0; i < 170; i++) {
-      const x = rand() * 512;
-      const y = rand() * 512;
-      const r = 2 + rand() * 11;
+
+    c.fillStyle = "#e9c98f";
+    c.fillRect(0, 0, SIZE, SIZE);
+    b.fillStyle = "#808080";
+    b.fillRect(0, 0, SIZE, SIZE);
+
+    const blot = (ctx: CanvasRenderingContext2D, x: number, y: number, r: number, inner: string, outer: string) => {
       const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, `rgba(150, 82, 24, ${0.25 + rand() * 0.45})`);
-      g.addColorStop(1, "rgba(150, 82, 24, 0)");
+      g.addColorStop(0, inner);
+      g.addColorStop(1, outer);
       ctx.fillStyle = g;
       ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.ellipse(x, y, r, r * (0.6 + rand() * 0.5), rand() * Math.PI, 0, Math.PI * 2);
+      ctx.fill();
+    };
+
+    // Uneven dough tone.
+    for (let i = 0; i < 60; i++) {
+      const light = rand() > 0.5;
+      blot(c, rand() * SIZE, rand() * SIZE, 60 + rand() * 140, light ? "rgba(250,228,180,0.35)" : "rgba(200,150,80,0.22)", "rgba(0,0,0,0)");
+    }
+    // Toasted blisters: golden halo, brown body, near-black core; raised in the bump map.
+    for (let i = 0; i < 140; i++) {
+      const x = rand() * SIZE;
+      const y = rand() * SIZE;
+      const r = 6 + Math.pow(rand(), 2) * 38;
+      blot(c, x, y, r * 1.8, "rgba(196,128,52,0.45)", "rgba(196,128,52,0)");
+      blot(c, x, y, r, `rgba(128,66,20,${0.55 + rand() * 0.35})`, "rgba(128,66,20,0)");
+      if (rand() > 0.45) blot(c, x, y, r * 0.4, "rgba(52,24,8,0.85)", "rgba(52,24,8,0)");
+      blot(b, x, y, r * 1.4, "rgba(255,255,255,0.7)", "rgba(255,255,255,0)");
+    }
+    // Flour dust and tiny pores.
+    for (let i = 0; i < 9000; i++) {
+      const x = rand() * SIZE;
+      const y = rand() * SIZE;
+      const dark = rand() > 0.7;
+      c.fillStyle = dark ? `rgba(140,90,40,${rand() * 0.35})` : `rgba(255,248,230,${rand() * 0.45})`;
+      c.fillRect(x, y, 1 + rand() * 2, 1 + rand() * 2);
+      b.fillStyle = dark ? "rgba(0,0,0,0.25)" : "rgba(255,255,255,0.2)";
+      b.fillRect(x, y, 2, 2);
+    }
+
+    const map = new THREE.CanvasTexture(colorCanvas);
+    map.colorSpace = THREE.SRGBColorSpace;
+    map.anisotropy = 8;
+    const bumpMap = new THREE.CanvasTexture(bumpCanvas);
+    return { map, bumpMap };
+  }, []);
+}
+
+/* ------------------------------------------------------- filling shapes --- */
+
+/** Displaces a sphere into an irregular lump; returns smooth, indexed geometry. */
+function lumpy(radius: number, detail: number, amount: number, seed: number) {
+  let g: THREE.BufferGeometry = new THREE.IcosahedronGeometry(radius, detail);
+  g.deleteAttribute("normal");
+  g.deleteAttribute("uv");
+  g = mergeVertices(g);
+  const pos = g.attributes.position as THREE.BufferAttribute;
+  const v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    const n =
+      Math.sin(v.x * 23 + seed) * Math.sin(v.y * 19 + seed * 1.7) * Math.sin(v.z * 21 + seed * 2.3) +
+      0.5 * Math.sin(v.x * 47 + v.z * 31 + seed);
+    v.multiplyScalar(1 + n * amount);
+    pos.setXYZ(i, v.x, v.y, v.z);
+  }
+  g.computeVertexNormals();
+  return g;
+}
+
+/** Seared tikka chunk: golden-orange flesh with dark char where the surface bulges. */
+function chickenGeometry() {
+  const g = lumpy(0.1, 3, 0.22, 4).scale(1.45, 0.8, 1);
+  const pos = g.attributes.position as THREE.BufferAttribute;
+  const colors = new Float32Array(pos.count * 3);
+  const base = new THREE.Color("#d4843a");
+  const sear = new THREE.Color("#4a230c");
+  const pale = new THREE.Color("#f0c48a");
+  const col = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+    const char = Math.max(0, Math.sin(x * 60) * Math.sin(z * 55 + 1) * Math.sin(y * 40 + 2));
+    col.copy(base).lerp(pale, Math.max(0, -y * 6) * 0.5).lerp(sear, Math.min(1, char * 1.6));
+    col.toArray(colors, i * 3);
+  }
+  g.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  return g;
+}
+
+/** A ruffled lettuce leaf: cupped, frilly at the rim, pale at the rib and deep green at the edge. */
+function lettuceGeometry() {
+  const g = new THREE.RingGeometry(0.02, 0.5, 72, 10);
+  const pos = g.attributes.position as THREE.BufferAttribute;
+  const colors = new Float32Array(pos.count * 3);
+  const rib = new THREE.Color("#e4f2a6");
+  const edge = new THREE.Color("#4e8d1f");
+  const col = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), y = pos.getY(i);
+    const r = Math.hypot(x, y) / 0.5;
+    const a = Math.atan2(y, x);
+    const frill = (Math.sin(a * 13) + 0.5 * Math.sin(a * 29 + 1)) * 0.06 * r * r;
+    pos.setXYZ(i, x * 1.3, y, frill - r * r * 0.14);
+    col.copy(rib).lerp(edge, Math.min(1, r * 1.15 + Math.abs(Math.sin(a * 13)) * 0.15));
+    col.toArray(colors, i * 3);
+  }
+  g.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  g.rotateX(-Math.PI / 2);
+  g.computeVertexNormals();
+  return g;
+}
+
+/** Cut face of a tomato slice: skin ring, flesh, seed-filled gel pockets and septa. */
+function tomatoFaceTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 256;
+  const ctx = canvas.getContext("2d")!;
+  const rand = seeded(21);
+  ctx.fillStyle = "#b8170f";
+  ctx.fillRect(0, 0, 256, 256);
+  ctx.fillStyle = "#e0402e";
+  ctx.beginPath();
+  ctx.arc(128, 128, 112, 0, Math.PI * 2);
+  ctx.fill();
+  for (let i = 0; i < 4; i++) {
+    const a = (i / 4) * Math.PI * 2 + 0.4;
+    const cx = 128 + Math.cos(a) * 58;
+    const cy = 128 + Math.sin(a) * 58;
+    ctx.fillStyle = "#f2834a";
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 34, 24, a, 0, Math.PI * 2);
+    ctx.fill();
+    for (let s = 0; s < 9; s++) {
+      ctx.fillStyle = "#f7e2a0";
+      ctx.beginPath();
+      ctx.ellipse(cx + (rand() - 0.5) * 40, cy + (rand() - 0.5) * 28, 4, 2.5, rand() * 3, 0, Math.PI * 2);
       ctx.fill();
     }
-    ctx.strokeStyle = "rgba(160, 90, 30, 0.22)";
-    ctx.lineWidth = 9;
-    for (let x = 40; x < 512; x += 72) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x + 40, 512);
-      ctx.stroke();
-    }
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    return texture;
-  }, []);
+  }
+  ctx.fillStyle = "#f06048";
+  ctx.beginPath();
+  ctx.arc(128, 128, 20, 0, Math.PI * 2);
+  ctx.fill();
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
 }
 
 /**
@@ -109,17 +242,25 @@ const tmp = new THREE.Vector3();
 function FillingMesh({
   items,
   geometry,
-  color,
-  roughness = 0.5,
+  material,
   progress,
 }: {
   items: Filling[];
   geometry: THREE.BufferGeometry;
-  color: string;
-  roughness?: number;
+  material: THREE.Material | THREE.Material[];
   progress: () => number;
 }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
+
+  // No two pieces of food are quite the same shade.
+  useLayoutEffect(() => {
+    const m = mesh.current;
+    if (!m) return;
+    const rand = seeded(items.length * 7 + 1);
+    const c = new THREE.Color();
+    items.forEach((_, i) => m.setColorAt(i, c.setScalar(0.86 + rand() * 0.22)));
+    if (m.instanceColor) m.instanceColor.needsUpdate = true;
+  }, [items]);
 
   useFrame((state) => {
     const m = mesh.current;
@@ -149,14 +290,12 @@ function FillingMesh({
   });
 
   return (
-    <instancedMesh ref={mesh} args={[geometry, undefined, items.length]} frustumCulled={false}>
-      <meshStandardMaterial color={color} roughness={roughness} />
-    </instancedMesh>
+    <instancedMesh ref={mesh} args={[geometry, material, items.length]} frustumCulled={false} />
   );
 }
 
 function WrapAssembly({ progress }: { progress: () => number }) {
-  const texture = useTortillaTexture();
+  const { map, bumpMap } = useTortillaMaps();
   const sheet = useRef<THREE.Mesh>(null);
   const lastK = useRef(-1);
 
@@ -169,23 +308,42 @@ function WrapAssembly({ progress }: { progress: () => number }) {
 
   const sets = useMemo(
     () => ({
-      lettuce: makeFillings(10, 3, [0.11, 0.17], [0.34, 0.05, 0.24]),
+      lettuce: makeFillings(13, 3, [0.11, 0.17], [0.85, 0.85, 0.75]),
       tomato: makeFillings(7, 5, [0.2, 0.26], [1, 1, 1]),
-      chicken: makeFillings(8, 9, [0.28, 0.36], [1, 1, 1]),
-      cheese: makeFillings(4, 13, [0.24, 0.27], [1, 1, 1]),
+      chicken: makeFillings(10, 9, [0.28, 0.36], [1, 1, 1]),
+      onion: makeFillings(6, 13, [0.24, 0.3], [1, 1, 1]),
     }),
     [],
   );
 
   const geos = useMemo(
     () => ({
-      lettuce: new THREE.IcosahedronGeometry(1, 1),
-      tomato: new THREE.CylinderGeometry(0.15, 0.15, 0.045, 24),
-      chicken: new THREE.CapsuleGeometry(0.055, 0.3, 6, 12).rotateZ(Math.PI / 2),
-      cheese: new THREE.BoxGeometry(0.3, 0.02, 0.26),
+      lettuce: lettuceGeometry(),
+      tomato: new THREE.CylinderGeometry(0.15, 0.14, 0.04, 40),
+      chicken: chickenGeometry(),
+      onion: new THREE.TorusGeometry(0.12, 0.016, 10, 32, Math.PI * 1.15),
     }),
     [],
   );
+
+  const mats = useMemo(() => {
+    const tomatoFace = new THREE.MeshPhysicalMaterial({ map: tomatoFaceTexture(), roughness: 0.3, clearcoat: 0.7, clearcoatRoughness: 0.2 });
+    return {
+      lettuce: new THREE.MeshPhysicalMaterial({
+        vertexColors: true,
+        roughness: 0.45,
+        clearcoat: 0.35,
+        clearcoatRoughness: 0.3,
+        sheen: 0.4,
+        sheenColor: new THREE.Color("#f2ffd0"),
+        side: THREE.DoubleSide,
+      }),
+      // Cylinder groups: skin around the side, the cut face on both caps.
+      tomato: [new THREE.MeshPhysicalMaterial({ color: "#c41e12", roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.1 }), tomatoFace, tomatoFace],
+      chicken: new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55 }),
+      onion: new THREE.MeshPhysicalMaterial({ color: "#a8417c", roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.2, sheen: 0.5, sheenColor: new THREE.Color("#fff0f8") }),
+    };
+  }, []);
 
   useFrame(() => {
     const k = smooth(span(progress(), 0.55, 0.86));
@@ -198,12 +356,20 @@ function WrapAssembly({ progress }: { progress: () => number }) {
   return (
     <group>
       <mesh ref={sheet} geometry={geometry}>
-        <meshStandardMaterial map={texture} roughness={0.8} side={THREE.DoubleSide} />
+        <meshPhysicalMaterial
+          map={map}
+          bumpMap={bumpMap}
+          bumpScale={2.5}
+          roughness={0.78}
+          sheen={0.35}
+          sheenColor="#fff3dc"
+          side={THREE.DoubleSide}
+        />
       </mesh>
-      <FillingMesh items={sets.lettuce} geometry={geos.lettuce} color={BRAND.green} roughness={0.45} progress={progress} />
-      <FillingMesh items={sets.tomato} geometry={geos.tomato} color={BRAND.red} roughness={0.3} progress={progress} />
-      <FillingMesh items={sets.chicken} geometry={geos.chicken} color="#c27a35" roughness={0.6} progress={progress} />
-      <FillingMesh items={sets.cheese} geometry={geos.cheese} color={BRAND.yellow} roughness={0.4} progress={progress} />
+      <FillingMesh items={sets.lettuce} geometry={geos.lettuce} material={mats.lettuce} progress={progress} />
+      <FillingMesh items={sets.tomato} geometry={geos.tomato} material={mats.tomato} progress={progress} />
+      <FillingMesh items={sets.chicken} geometry={geos.chicken} material={mats.chicken} progress={progress} />
+      <FillingMesh items={sets.onion} geometry={geos.onion} material={mats.onion} progress={progress} />
     </group>
   );
 }
