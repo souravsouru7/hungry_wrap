@@ -77,6 +77,7 @@ const RESTAURANT_JSON_LD = {
   name: SITE.name,
   image: `${SITE.url}/brand/logo.png`,
   url: SITE.url,
+  telephone: SITE.phone,
   hasMap: SITE.links.maps,
   address: {
     "@type": "PostalAddress",

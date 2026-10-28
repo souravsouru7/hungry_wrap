@@ -1,7 +1,6 @@
 /**
  * Every site-wide constant lives here so the real cafe details are filled in
- * exactly once. The `TODO:` strings below are the only values still outstanding —
- * replacing them is all that stands between the WhatsApp CTAs and a working number.
+ * exactly once. The `TODO:` strings below are the only values still outstanding.
  */
 export const SITE = {
   name: "The Hungry Wrap",
@@ -14,9 +13,11 @@ export const SITE = {
     swiggy: "https://www.swiggy.com/city/nagpur/the-hungry-wrap-pratap-nagar-rest1410251",
     zomato: "https://www.zomato.com/nagpur/the-hungry-wrap-1-hingna-t-point",
   },
-  phone: "TODO: +91XXXXXXXXXX",
+  /** Calls and WhatsApp share this one number. */
+  phone: "+917709846604",
+  phoneDisplay: "+91 77098 46604",
   /** Digits only, with country code and no `+` — the format wa.me expects. */
-  whatsapp: "TODO: 91XXXXXXXXXX",
+  whatsapp: "917709846604",
   email: "TODO: hello@example.com",
   hours: [
     { days: "Monday to Saturday", time: "9:00 AM – 10:00 PM" },

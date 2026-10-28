@@ -7,7 +7,7 @@ import Reveal from "@/components/Reveal";
 import TiltCard from "@/components/motion/TiltCard";
 import SceneFrame from "@/components/three/SceneFrame";
 import { HERO_ASSETS } from "@/components/hungry-wrap/exact-hero/assets";
-import { NAV_LINKS, ORDER_HREF, SITE } from "@/lib/site";
+import { NAV_LINKS, ORDER_HREF, SITE, TEL_HREF, whatsappUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: { absolute: "Contact Us | Location, Hours & Delivery | The Hungry Wrap Nagpur" },
@@ -69,6 +69,16 @@ export default function ContactPage() {
               <section data-reveal className={card}>
                 <h2 className={h2}>Get in Touch</h2>
                 <ul className="mt-3 space-y-2">
+                  <li>
+                    <strong className="text-[#211b18]">Call / WhatsApp:</strong>{" "}
+                    <a className={link} href={TEL_HREF}>
+                      {SITE.phoneDisplay}
+                    </a>
+                    {" · "}
+                    <a className={link} href={whatsappUrl("Hi! I'd like to know more about The Hungry Wrap.")} target="_blank" rel="noopener noreferrer">
+                      WhatsApp
+                    </a>
+                  </li>
                   <li>
                     <strong className="text-[#211b18]">Delivery Orders:</strong>{" "}
                     <a className={link} href={SITE.links.swiggy} target="_blank" rel="noopener noreferrer">

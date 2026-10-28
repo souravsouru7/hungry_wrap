@@ -3,12 +3,13 @@
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { FormEvent, ReactNode } from "react";
-import { ArrowRight, Camera, ChefHat, Heart, Leaf, MapPin, Smile, Sparkles } from "lucide-react";
+import { ArrowRight, ChefHat, Heart, Leaf, MapPin, Phone, Smile, Sparkles } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import { BRAND_LOGO } from "@/components/hungry-wrap/exact-hero/assets";
-import { SITE } from "@/lib/site";
+import InstagramGlyph from "@/components/InstagramGlyph";
+import { SITE, TEL_HREF, whatsappUrl } from "@/lib/site";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -41,13 +42,13 @@ const SOCIALS = ["Instagram"] as const;
 const DEFAULT_SOCIAL_LINKS: SocialLink[] = [{ platform: "Instagram", href: SITE.links.instagram }];
 
 const DELIVERY_LINKS = [
-  { label: "Order on Swiggy", href: SITE.links.swiggy, className: "bg-[#fc8019] text-white" },
-  { label: "Order on Zomato", href: SITE.links.zomato, className: "bg-[#e23744] text-white" },
+  { label: "Order on Swiggy", href: SITE.links.swiggy, logo: "/brand/swiggy.png", width: 336, height: 101 },
+  { label: "Order on Zomato", href: SITE.links.zomato, logo: "/brand/zomato.png", width: 265, height: 60 },
 ] as const;
 
 function SocialGlyph({ platform }: { platform: string }) {
   const normalized = platform.toLowerCase();
-  if (normalized === "instagram") return <Camera aria-hidden className="h-4 w-4" strokeWidth={2.5} />;
+  if (normalized === "instagram") return <InstagramGlyph />;
   return <span aria-hidden className="font-[family-name:var(--font-poppins)] text-base font-bold leading-none">f</span>;
 }
 
@@ -210,9 +211,21 @@ export default function FinalCtaFooter({
                 <a href={SITE.links.maps} target="_blank" rel="noopener noreferrer" className="mt-1 block font-semibold text-[#f47514] decoration-2 underline-offset-4 hover:underline focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f47514]">Get directions</a>
               </span>
             </address>
+            <p className="mt-3 flex gap-2 font-[family-name:var(--font-poppins)] text-[.88rem] leading-relaxed text-[#77716c]">
+              <Phone aria-hidden className="mt-1 h-4 w-4 shrink-0 text-[#f47514]" strokeWidth={2.5} />
+              <span>
+                <a href={TEL_HREF} className="font-semibold text-[#211b18] decoration-2 underline-offset-4 hover:text-[#f47514] hover:underline focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f47514]">{SITE.phoneDisplay}</a>
+                {" · "}
+                <a href={whatsappUrl("Hi! I'd like to know more about The Hungry Wrap.")} target="_blank" rel="noopener noreferrer" className="font-semibold text-[#f47514] decoration-2 underline-offset-4 hover:underline focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f47514]">WhatsApp</a>
+              </span>
+            </p>
             <ul className="mt-4 flex flex-wrap gap-2">
-              {DELIVERY_LINKS.map(({ label, href, className }) => (
-                <li key={label}><a href={href} target="_blank" rel="noopener noreferrer" className={`inline-flex min-h-10 items-center rounded-full px-4 font-[family-name:var(--font-poppins)] text-[.78rem] font-semibold transition duration-300 hover:scale-105 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#f47514] ${className}`}>{label}</a></li>
+              {DELIVERY_LINKS.map(({ label, href, logo, width, height }) => (
+                <li key={label}>
+                  <a href={href} target="_blank" rel="noopener noreferrer" aria-label={label} title={label} className="inline-flex h-11 items-center rounded-full bg-white px-5 shadow-[0_8px_20px_-15px_rgba(70,45,26,.45)] ring-1 ring-[#f0e5da] transition duration-300 hover:scale-105 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#f47514]">
+                    <Image src={logo} alt="" width={width} height={height} sizes="96px" className="h-6 w-auto" />
+                  </a>
+                </li>
               ))}
             </ul>
           </section>

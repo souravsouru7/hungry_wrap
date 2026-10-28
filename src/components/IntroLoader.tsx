@@ -201,7 +201,9 @@ export default function IntroLoader() {
             />
           </div>
 
+          {/* suppressHydrationWarning: form-filler extensions (e.g. Edge's `fdprocessedid`) tag buttons before React hydrates. */}
           <button
+            suppressHydrationWarning
             type="button"
             onClick={() => setLeaving(true)}
             className="absolute right-5 bottom-5 rounded-full px-4 py-2 font-[family-name:var(--font-poppins)] text-xs font-semibold tracking-wide text-[#77716c] uppercase transition-colors hover:text-[#f47514] focus-visible:outline-2 focus-visible:outline-[#f47514]"

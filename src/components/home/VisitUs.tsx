@@ -1,14 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Camera, Clock, MapPin, Navigation } from "lucide-react";
+import { Clock, MapPin, Navigation } from "lucide-react";
 
 import { BRAND_MARK } from "@/components/hungry-wrap/exact-hero/assets";
+import InstagramGlyph from "@/components/InstagramGlyph";
 import { SITE } from "@/lib/site";
 
 import { Stagger, StaggerItem } from "./motion/Stagger";
 
 const orderBtn =
-  "inline-flex min-h-14 items-center justify-center rounded-2xl px-6 font-semibold text-white transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.03] active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 motion-reduce:transition-none";
+  "inline-flex min-h-14 items-center justify-center rounded-2xl bg-white px-6 shadow-[0_12px_22px_-16px_rgba(93,30,0,.7)] transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.03] active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 motion-reduce:transition-none";
 
 /** Address, hours and every way to order, in one place. */
 export default function VisitUs() {
@@ -78,11 +79,11 @@ export default function VisitUs() {
           </h3>
           <p className="relative text-[.95rem] text-white/90">Get it delivered hot from your favourite app.</p>
           <div className="relative mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-            <a href={SITE.links.swiggy} target="_blank" rel="noopener noreferrer" className={`${orderBtn} bg-[#211b18] focus-visible:outline-white`}>
-              Order on Swiggy
+            <a href={SITE.links.swiggy} target="_blank" rel="noopener noreferrer" aria-label="Order on Swiggy" className={`${orderBtn} focus-visible:outline-white`}>
+              <Image src="/brand/swiggy.png" alt="" width={336} height={101} sizes="128px" className="h-8 w-auto" />
             </a>
-            <a href={SITE.links.zomato} target="_blank" rel="noopener noreferrer" className={`${orderBtn} bg-[#e23744] focus-visible:outline-white`}>
-              Order on Zomato
+            <a href={SITE.links.zomato} target="_blank" rel="noopener noreferrer" aria-label="Order on Zomato" className={`${orderBtn} focus-visible:outline-white`}>
+              <Image src="/brand/zomato.png" alt="" width={265} height={60} sizes="128px" className="h-7 w-auto" />
             </a>
           </div>
           <a
@@ -91,7 +92,7 @@ export default function VisitUs() {
             rel="noopener noreferrer"
             className="group relative mt-2 inline-flex items-center gap-2 self-start font-semibold text-white underline-offset-4 hover:underline"
           >
-            <Camera aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:scale-125 group-hover:-rotate-12" />
+            <InstagramGlyph className="h-4 w-4 transition-transform duration-300 group-hover:scale-125 group-hover:-rotate-12" />
             Follow @thehungrywrap
           </a>
         </StaggerItem>
